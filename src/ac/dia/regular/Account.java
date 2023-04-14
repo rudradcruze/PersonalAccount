@@ -1,4 +1,4 @@
-package ac.dia.shortcourse;
+package ac.dia.regular;
 
 public class Account {
 	
