@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.Calendar;
 import java.util.Date;
 
 public class Transaction {
@@ -66,6 +67,83 @@ public class Transaction {
 		account.getTransactions().add(this);
 	}
 	
+	public void deposit(FixedDeposit account, double amount) {
+		if (account.countTransition() >= 1 || account.getStatus() == "close")
+			System.err.println("Cannot perform this operation.");
+		else {
+			transType = "deposit";
+			transDate = new Date();
+			setTransAccount(account);
+			setTransAmount(amount);
+			account.deposit(amount);
+			account.setStatus("active");
+			account.getTransactions().add(this);
+		}
+	}
+	
+	private boolean checkDateAligibility(FixedDeposit account) {
+		Date lastTransitionDate = new Date();
+		DateTimeFormatter dTformatter = DateTimeFormatter.ofPattern("dd/MM/uuuu");
+		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+		
+		for(Transaction transaction : account.getTransactions()) {
+			if (transaction.getTransType() == "deposit") {
+				lastTransitionDate = transaction.getTransDate();
+//				break;
+			}
+		}
+		
+		Calendar c = Calendar.getInstance();
+		c.setTime(lastTransitionDate);
+		c.add(Calendar.YEAR, account.getYear());
+		lastTransitionDate = c.getTime();
+		
+//		System.out.println(lastTransitionDate);
+		
+//		String nowDate = "14/04/2026";
+		String strDate = formatter.format(lastTransitionDate);
+		String nowDate = formatter.format(new Date());
+		
+		LocalDate dateLast = LocalDate.parse(strDate, dTformatter);
+		LocalDate dateNow = LocalDate.parse(nowDate, dTformatter);
+		
+		long dayBetween = ChronoUnit.DAYS.between(dateLast, dateNow);
+		long printDifference = dayBetween;
+		
+		byte year = (byte) (printDifference / 365);
+		printDifference = printDifference % 365;
+		byte month = (byte) (printDifference / 30);
+		byte day = (byte) (printDifference % 30);
+		
+		if(dayBetween >= 0 && account.getStatus() == "close")
+			return true;
+		else {
+			System.out.println(year + " year, " + month + " month, " + day + " days left");
+			return false;
+		}
+	}
+	
+	public void withdraw(FixedDeposit account) {
+		boolean interest = false;
+		boolean checkDate = checkDateAligibility(account);
+		
+		for(Transaction transaction : account.getTransactions()) {
+			if (transaction.getTransType() == "interest")
+				interest = true;
+		}
+		
+		if(interest == true && checkDate == true) {			
+			double balance = account.getAccountBalance();
+        	transType = "withdraw";
+			transDate = new Date();
+			setTransAccount(account);
+			setTransAmount(balance);
+			account.withdraw(balance);
+			account.getTransactions().add(this);
+		} else
+			System.err.println("The withdraw cannot procced.");
+    }
+	
 	public void withdraw(Account account, double amount) {
 		if (account.getAccountBalance() > amount) {
 			transType = "withdraw";
@@ -76,6 +154,28 @@ public class Transaction {
 			account.getTransactions().add(this);
 		} else {
 			System.err.println("insufficient Balance");
+		}
+	}
+	
+	public void calculateInterest(FixedDeposit account) {
+		boolean interest = false;
+		boolean dateCheck = checkDateAligibility(account);
+		for(Transaction transaction : account.getTransactions()) {
+			if (transaction.getTransType() == "interest")
+				interest = true;
+		}
+		
+		if(account.getStatus() != "close" || interest == true || dateCheck == false)
+			System.err.println("The Interest cannot be procced.");
+		else {
+			double interestAmount = (double)(account.getAccountBalance() * account.getInterestRate() * account.getYear()) / 100.00;
+//			account.setAccountBalance(account.getAccountBalance() + dailyInterest);
+			transType = "interest";
+			transDate = new Date();
+			setTransAmount(interestAmount);
+			setTransAccount(account);
+			account.deposit(interestAmount);
+			account.getTransactions().add(this);
 		}
 	}
 	
@@ -119,8 +219,6 @@ public class Transaction {
 	}
 	
 	public void calculateInterest(SavingsAccount account) {
-		double totalTransition = account.countTransition();
-		
 		int count=0;
 		Date lastTransitionDate = new Date();
 		DateTimeFormatter dTformatter = DateTimeFormatter.ofPattern("dd/MM/uuuu");

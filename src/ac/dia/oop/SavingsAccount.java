@@ -46,6 +46,7 @@ public class SavingsAccount extends Account {
 	public void display() {
 		System.out.println("- " + getAccType());
 		System.out.println("- Transition Count: " + countTransition());
+		System.out.println("- Interest Rate: " + getRate());
 		super.display();
 	}
 }

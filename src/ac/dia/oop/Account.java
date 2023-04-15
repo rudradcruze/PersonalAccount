@@ -68,10 +68,10 @@ public class Account {
 	}
 	
 	public void withdraw(double amount) {
-		if (accountBalance > amount)
+		if (accountBalance >= amount)
 			accountBalance -= amount;
 		else {
-			System.out.println("insufficient Balance");
+			System.err.println("insufficient Balance");
 		}
 	}
 

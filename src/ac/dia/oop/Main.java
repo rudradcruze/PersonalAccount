@@ -3,7 +3,32 @@ package ac.dia.oop;
 public class Main {
 
 	public static void main(String[] args) {
-	
+		
+//		Fixed Account
+		FixedDeposit fx1 = new FixedDeposit();
+		fx1.setAccountNo(5001);
+		fx1.setAccountTitle("Nella");
+		fx1.setInterestRate(10);
+		fx1.setYear((byte) 3);
+//		fx1.setAccountBalance(10000);
+		
+		Transaction fxtrans1 = new Transaction();
+		fxtrans1.setTransId(6001);
+		fxtrans1.deposit(fx1, 20000);
+		
+		Transaction fxtrans2 = new Transaction();
+		fxtrans2.setTransId(6002);
+		fx1.setStatus("close");
+		fxtrans2.calculateInterest(fx1);
+		
+		Transaction fxtrans3 = new Transaction();
+		fxtrans3.withdraw(fx1);
+		
+		fx1.display();
+
+
+		
+		/* Current Account
 		CurrentAccount currentAcc = new CurrentAccount();
 		currentAcc.setAccountNo(2001);
 		currentAcc.setAccountTitle("Test Current");
@@ -39,6 +64,7 @@ public class Main {
 		
 		currentAcc.display();
 		acc2.display();
+		*/
 		
 		/* savings
 		Account acc1 = new Account();
