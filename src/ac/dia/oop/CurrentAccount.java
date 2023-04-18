@@ -8,7 +8,6 @@ public class CurrentAccount extends Account {
 	private String accType = "Current Account";
 	private double creditLimit;
 	private double dailyInterestRate;
-	private double dailyInterest;
 	SimpleDateFormat cDate = new SimpleDateFormat();
 	
 	public CurrentAccount() {
@@ -35,15 +34,36 @@ public class CurrentAccount extends Account {
 		this.dailyInterestRate = dailyInterestRate;
 	}
 	
-	public void calculateInterest() {
-		dailyInterest = getAccountBalance() * dailyInterestRate;
-        setAccountBalance(getAccountBalance() + dailyInterest);
-        Transaction transaction = new Transaction();
-        transaction.setTransAccount(this);
-        transaction.setTransType("interest");
-        transaction.setTransAmount(dailyInterest);
-        transaction.setTransDate(new Date());
-        getTransactions().add(transaction);
+	@Override
+	public void withdraw(double amount) {
+		if(amount > getAccountBalance())
+			System.err.println("You are spending over your balance.");
+		
+        double availableBalance = getAccountBalance() + getCreditLimit();
+        if (availableBalance >= amount) {
+        	setAccountBalance(getAccountBalance() - amount);
+        } else {
+            System.err.println("Exceeded credit limit.");
+            getTransactions().remove(getTransactions().size()-1);
+        }
+    }
+	
+	@Override
+	public double interest() {
+		int count=0;
+		for(Transaction transaction : getTransactions()) {
+			if (cDate.format(transaction.getTransDate()).equals(cDate.format(new Date())) &&
+					transaction.getTransType() == "interest")
+					count++;
+		}
+		
+		if(count != 0) {			
+//			System.err.println("The interest is already applied.");
+			return 0;
+		} else {
+			double interestAmount = (getAccountBalance() * 1 * (getDailyInterestRate()/100.00));
+			return interestAmount;
+		}
 	}
 	
     @Override

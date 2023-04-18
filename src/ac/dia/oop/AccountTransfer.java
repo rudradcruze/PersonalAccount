@@ -2,7 +2,7 @@ package ac.dia.oop;
 
 public class AccountTransfer extends Transaction {
 	private Account accTo;
-	private String transType = "Transfer";
+	private String transType = "transfer";
 	
 	public void transfer(Account by, Account to, double amount) {
 		setAccTo(to);
@@ -32,6 +32,7 @@ public class AccountTransfer extends Transaction {
 	
 	@Override
     public String toString() {
-        return "Transaction id=" + getTransId() + ", date=" + getTransDate() + ", type=" + getTransType()+ ", amount=" + getTransAmount() + " from " + getTransAccount().getAccountNo() + " to " + getAccTo().getAccountNo() + '\n';
+		return "\t" + getTransId() + "\t\t"+ getTransType() + "\t\t" + cDate.format(getTransDate()) + "\t" + getTransAmount() + "\t" + getTransAccount().getAccountNo()+ "\t\t\t" +getAccTo().getAccountNo();
+//        return "Transaction id=" + getTransId() + ", date=" + getTransDate() + ", type=" + getTransType()+ ", amount=" + getTransAmount() + " from " + getTransAccount().getAccountNo() + " to " + getAccTo().getAccountNo();
     }
 }
